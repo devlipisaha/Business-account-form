@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Bank Account Application – Prominence Bank</title>
+<style>
+/* Same Prominence Bank palette as personal form */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sky:#5BC8F5;--sky-d:#3aadda;
+  --navy:#1C2B4A;--navy-d:#162039;--navy-m:#223560;
+  --elec:#2D9CDB;--elec2:#4AB8E8;
+  --white:#FFFFFF;--muted:#7aaec8;
+  --formbg:#f4f8fc;--bdr:#b0cfe8;
+  --txt:#162039;--lbl:#1a3557;
+  --err:#c0392b;--grn:#1e8449;
+  --r:5px;--shd:0 4px 24px rgba(28,43,74,.14);
+}
+.pb-wrap{font-family:Georgia,'Times New Roman',serif;background:#fff;color:var(--txt);max-width:900px;margin:0 auto 48px;border:1px solid var(--bdr);border-top:4px solid var(--sky);border-radius:8px;box-shadow:var(--shd);overflow:hidden;}
+.pb-topbar{background:var(--sky);color:var(--navy-d);padding:8px 36px;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.03em;}
+.pb-header{background:var(--navy);padding:26px 36px 22px;border-bottom:3px solid var(--sky);}
+.pb-header .badge{font-family:Arial,sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--sky);margin-bottom:7px;}
+.pb-header h1{font-size:21px;font-weight:700;color:var(--white);margin-bottom:5px;}
+.pb-header p{font-size:13px;color:var(--muted);font-style:italic;}
+.pb-stepnav{background:var(--navy-d);display:flex;overflow-x:auto;padding:0 16px;border-bottom:3px solid var(--sky);}
+.pb-tab{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:13px 14px;font-family:Arial,sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-3px;white-space:nowrap;user-select:none;cursor:default;transition:color .2s,border-color .2s;}
+.pb-tab .num{width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:#253c62;color:var(--muted);flex-shrink:0;transition:background .2s,color .2s;}
+.pb-tab.active{color:var(--sky);border-bottom-color:var(--sky);}
+.pb-tab.active .num{background:var(--sky);color:var(--navy-d);}
+.pb-tab.done{color:#6fdba8;}
+.pb-tab.done .num{background:var(--grn);color:#fff;}
+.pb-prog-wrap{background:#d4e9f7;height:5px;}
+.pb-prog-bar{height:5px;background:var(--sky);transition:width .4s ease;}
+.pb-prog-label{display:flex;justify-content:space-between;font-family:Arial,sans-serif;font-size:12px;color:var(--navy);padding:8px 36px;background:#e6f3fb;border-bottom:1px solid var(--bdr);}
+.pb-prog-label span{font-weight:700;color:var(--navy);}
+.pb-body{padding:32px 36px;background:#fff;}
+.pb-panel{display:none;}.pb-panel.active{display:block;}
+.pb-stitle{font-size:13px;font-weight:700;color:var(--navy);margin:26px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--sky);font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;}
+.pb-stitle:first-child{margin-top:0;}
+.pb-note{background:#e6f3fb;border-left:4px solid var(--sky);padding:11px 15px;font-size:13px;color:var(--navy);margin-bottom:18px;border-radius:0 4px 4px 0;line-height:1.6;}
+.row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:13px;}
+.f{flex:1 1 200px;display:flex;flex-direction:column;gap:4px;}
+.f.full{flex:1 1 100%;}.f.half{flex:1 1 calc(50% - 8px);}.f.third{flex:1 1 calc(33.33% - 11px);}
+label{font-family:Arial,sans-serif;font-size:12.5px;font-weight:700;color:var(--lbl);letter-spacing:.02em;}
+label .req{color:var(--err);margin-left:2px;}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=url],textarea,select{font-family:Arial,sans-serif;font-size:13.5px;color:var(--txt);background:#fff;border:1.5px solid var(--bdr);border-radius:var(--r);padding:9px 12px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--elec);box-shadow:0 0 0 3px rgba(45,156,219,.13);}
+input.err,select.err,textarea.err{border-color:var(--err);}
+textarea{resize:vertical;min-height:80px;}
+.ferr{font-family:Arial,sans-serif;font-size:11.5px;color:var(--err);display:none;}
+.ferr.show{display:block;}
+.filebox{border:2px dashed var(--bdr);border-radius:var(--r);padding:18px;text-align:center;background:var(--formbg);cursor:pointer;transition:border-color .2s,background .2s;}
+.filebox:hover{border-color:var(--elec);background:#daeef8;}
+.filebox input{display:none;}
+.filebtn{display:inline-block;background:var(--navy);color:var(--white);font-family:Arial,sans-serif;font-size:12px;font-weight:700;padding:8px 20px;border-radius:4px;cursor:pointer;margin-bottom:8px;transition:background .2s;}
+.filebtn:hover{background:var(--navy-m);}
+.filename{font-family:Arial,sans-serif;font-size:12px;color:var(--muted);}
+.fileclear{display:none;background:none;border:none;color:var(--err);font-size:12px;cursor:pointer;margin-left:6px;text-decoration:underline;}
+.chk{display:flex;align-items:flex-start;gap:8px;font-family:Arial,sans-serif;font-size:13px;line-height:1.5;color:var(--txt);cursor:pointer;}
+.chk input{margin-top:2px;accent-color:var(--elec);flex-shrink:0;}
+.coll{border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:13px;overflow:hidden;}
+.coll-head{background:#daeef8;padding:11px 15px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+.coll-head::after{content:'▼';font-size:11px;color:var(--elec);transition:transform .25s;}
+.coll-head.open::after{transform:rotate(180deg);}
+.coll-body{display:none;padding:15px;font-size:13px;line-height:1.75;color:#334;background:#fff;}
+.coll-body.open{display:block;}
+.paybox{background:var(--navy);color:var(--white);border-radius:var(--r);padding:20px 24px;margin-bottom:18px;}
+.paybox h3{color:var(--sky);font-size:13.5px;margin-bottom:10px;font-family:Arial,sans-serif;}
+.paybox p,.paybox li{font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#b8d4e8;margin-bottom:5px;}
+.paybox ul{padding-left:18px;}
+.paybox strong{color:var(--elec2);}
+.paybox hr{border-color:#253c62;margin:13px 0;}
+.paybox .cryptoaddr{background:#0e1928;border:1px solid #253c62;border-radius:4px;padding:8px 12px;font-family:monospace;font-size:12.5px;color:var(--elec2);word-break:break-all;margin-top:4px;}
+.sig-wrap{border:1.5px solid var(--bdr);border-radius:var(--r);background:#fff;overflow:hidden;}
+.sig-toolbar{background:#daeef8;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif;font-size:12px;color:var(--navy);}
+canvas{display:block;width:100%;height:120px;cursor:crosshair;touch-action:none;}
+.sig-clr{background:none;border:1px solid #a0c8e0;border-radius:4px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--navy);}
+.agreebox{background:#e6f3fb;border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;}
+.pb-navrow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-top:1px solid var(--bdr);padding:24px 36px 28px;background:#fff;}
+.btn{font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:11px 28px;border-radius:var(--r);border:none;cursor:pointer;transition:background .18s,transform .1s;}
+.btn:active{transform:translateY(1px);}
+.btn-sky{background:var(--sky);color:var(--navy-d);}
+.btn-sky:hover{background:var(--sky-d);color:#fff;}
+.btn-navy{background:transparent;color:var(--navy);border:2px solid var(--navy);}
+.btn-navy:hover{background:var(--navy);color:#fff;}
+.btn-ghost{background:transparent;color:#5a7a9a;border:1px solid var(--bdr);}
+.btn-ghost:hover{background:var(--formbg);}
+.btn-submit{background:var(--navy);color:var(--sky);padding:13px 36px;}
+.btn-submit:hover{background:var(--navy-d);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:var(--sky);font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:12px 22px;border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.28);z-index:9999;display:none;animation:slidein .3s ease;}
+@keyframes slidein{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.pb-success{display:none;text-align:center;padding:52px 36px;background:#fff;}
+.pb-success.show{display:block;}
+.pb-success .icon{width:62px;height:62px;margin:0 auto 18px;background:var(--grn);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.pb-success .icon svg{width:30px;height:30px;color:#fff;}
+.pb-success h2{font-size:22px;color:var(--navy);margin-bottom:10px;}
+.pb-success p{font-size:14px;color:#5a7a9a;line-height:1.7;}
+/* Repeater */
+.rpt-item{border:1px solid var(--bdr);border-radius:var(--r);padding:18px;margin-bottom:14px;background:#f9fcfe;}
+.rpt-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:var(--navy);}
+.rpt-rm{background:none;border:1px solid #f5b8b8;border-radius:4px;color:var(--err);font-size:12px;padding:3px 10px;cursor:pointer;}
+@media(max-width:640px){
+  .pb-body,.pb-navrow{padding-left:16px;padding-right:16px;}
+  .pb-header,.pb-topbar,.pb-prog-label{padding-left:16px;padding-right:16px;}
+  .f,.f.half,.f.third{flex:1 1 100%;}
+  .pb-navrow{flex-direction:column-reverse;}
+  .btn{width:100%;text-align:center;}
+  .pb-tab{padding:12px 8px;font-size:9.5px;}
+}
+</style>
+</head>
+<body>
+<div class="pb-wrap" id="pbbf">
+
+  <div class="pb-topbar">🔒 &nbsp;Prominence Bank — Confidential &nbsp;|&nbsp; Diplomatic Jurisdiction – ETMO</div>
+
+  <div class="pb-header">
+    <div class="badge">Corporate / Business Banking Application</div>
+    <h1>Business Bank Account Application</h1>
+    <p>Please complete all required fields in BLOCK CAPITALS. Incomplete applications may be rejected without review.</p>
+  </div>
+
+  <div class="pb-stepnav" id="pbbf-tabs">
+    <div class="pb-tab active" data-s="1"><span class="num">1</span>Account Type</div>
+    <div class="pb-tab" data-s="2"><span class="num">2</span>Company Details</div>
+    <div class="pb-tab" data-s="3"><span class="num">3</span>Signatory &amp; Director</div>
+    <div class="pb-tab" data-s="4"><span class="num">4</span>Beneficiaries</div>
+    <div class="pb-tab" data-s="5"><span class="num">5</span>Funding &amp; Account</div>
+    <div class="pb-tab" data-s="6"><span class="num">6</span>Documents &amp; Fees</div>
+    <div class="pb-tab" data-s="7"><span class="num">7</span>Declaration</div>
+  </div>
+
+  <div class="pb-prog-wrap"><div class="pb-prog-bar" id="bp-bar" style="width:14.28%"></div></div>
+  <div class="pb-prog-label">
+    <div>Step <span id="bp-cur">1</span> of 7</div>
+    <div><span id="bp-pct">14</span>% Complete</div>
+  </div>
+
+  <form id="pbbf-form" novalidate>
+  <div class="pb-body">
+
+    <!-- STEP 1 -->
+    <div class="pb-panel active" data-p="1">
+      <p class="pb-stitle">Application ID &amp; Account Type</p>
+      <div class="pb-note">Savings, Custody, and Numbered Accounts are eligible for KEY TESTED TELEX (KTT) transactions.</div>
+      <div class="row"><div class="f full"><label for="b-appid">Application ID <span class="req">*</span></label><input type="text" id="b-appid" name="application_id" placeholder="e.g. PB-BIZ-2025-XXXXXX" required><span class="ferr" id="e-b-appid">Application ID is required.</span></div></div>
+      <p class="pb-stitle">Select Corporate Account Type</p>
+      <div class="row">
+        <div class="f full">
+          <label>Apply for a New Corporate Bank Account <span class="req">*</span></label>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px;">
+            <label class="chk"><input type="radio" name="b_acct_type" value="Savings Account (€25,000 fee)" required> Savings Account &nbsp;<em style="color:#5a8aaa;font-size:12px;">(Opening Fee €25,000)</em></label>
+            <label class="chk"><input type="radio" name="b_acct_type" value="Custody Account (€25,000 fee)"> Custody Account &nbsp;<em style="color:#5a8aaa;font-size:12px;">(Opening Fee €25,000)</em></label>
+            <label class="chk"><input type="radio" name="b_acct_type" value="Numbered Account (€50,000 fee)"> Numbered Account &nbsp;<em style="color:#5a8aaa;font-size:12px;">(Opening Fee €50,000)</em></label>
+            <label class="chk"><input type="radio" name="b_acct_type" value="Cryptocurrency Account (€25,000 fee)"> Cryptocurrency Account &nbsp;<em style="color:#5a8aaa;font-size:12px;">(Opening Fee €25,000)</em></label>
+          </div>
+          <span class="ferr" id="e-b-acct">Please select an account type.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="pb-panel" data-p="2">
+      <p class="pb-stitle">Corporation — Company Details</p>
+      <div class="row"><div class="f full"><label for="b-cn">Company Name <span class="req">*</span></label><input type="text" id="b-cn" name="company_name" required><span class="ferr" id="e-b-cn">Required.</span></div></div>
+      <div class="row"><div class="f full"><label for="b-ra">Registered Address <span class="req">*</span></label><input type="text" id="b-ra" name="registered_address" required><span class="ferr" id="e-b-ra">Required.</span></div></div>
+      <div class="row"><div class="f full"><label for="b-ra2">Registered Address Line 2</label><input type="text" id="b-ra2" name="registered_address_2"></div></div>
+      <div class="row">
+        <div class="f third"><label for="b-city">City</label><input type="text" id="b-city" name="city"></div>
+        <div class="f third"><label for="b-state">State</label><input type="text" id="b-state" name="state"></div>
+        <div class="f third"><label for="b-zip">Zip Code</label><input type="text" id="b-zip" name="zip_code"></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-ctry">Country <span class="req">*</span></label><input type="text" id="b-ctry" name="company_country" required><span class="ferr" id="e-b-ctry">Required.</span></div>
+        <div class="f half"><label for="b-tel">Telephone No. <span class="req">*</span></label><input type="tel" id="b-tel" name="company_telephone" required><span class="ferr" id="e-b-tel">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-regno">Company Registration No.</label><input type="text" id="b-regno" name="company_registration_no"></div>
+        <div class="f half"><label for="b-incorp">Date of Incorporation <span class="req">*</span></label><input type="date" id="b-incorp" name="date_of_incorporation" required><span class="ferr" id="e-b-incorp">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-tax">Tax ID / VAT Number</label><input type="text" id="b-tax" name="tax_id_vat"></div>
+        <div class="f half"><label for="b-web">Company Website</label><input type="url" id="b-web" name="company_website" placeholder="https://"></div>
+      </div>
+      <div class="row"><div class="f full"><label for="b-em">Company Email <span class="req">*</span></label><input type="email" id="b-em" name="company_email" required><span class="ferr" id="e-b-em">Valid email required.</span></div></div>
+      <div class="row"><div class="f full"><label for="b-act">Brief Description of Primary Company Activity</label><textarea id="b-act" name="company_activity" rows="3"></textarea></div></div>
+      <p class="pb-stitle">Company Registration Certificate</p>
+      <div class="f full" style="margin-bottom:18px;">
+        <label>Insert Full Color Copy of your Company Registration Certificate <span class="req">*</span></label>
+        <div class="filebox" onclick="document.getElementById('b-certfile').click()">
+          <input type="file" id="b-certfile" name="company_cert" accept="image/*,.pdf" required onchange="hFile(this,'b-certname','b-certclear')">
+          <span class="filebtn">Choose File</span>
+          <span class="filename" id="b-certname">No file chosen</span>
+          <button type="button" class="fileclear" id="b-certclear" onclick="clrFile(event,'b-certfile','b-certname','b-certclear')">Remove</button>
+        </div>
+        <span class="ferr" id="e-b-cert">Company registration certificate is required.</span>
+      </div>
+      <p class="pb-stitle">Expected Transfer Activity</p>
+      <div class="row"><div class="f full"><label for="b-cout">Main countries — outgoing transfers</label><input type="text" id="b-cout" name="countries_outgoing"></div></div>
+      <div class="row"><div class="f full"><label for="b-cin">Main countries — incoming transfers</label><input type="text" id="b-cin" name="countries_incoming"></div></div>
+      <div class="row">
+        <div class="f half"><label for="b-oc">Est. outgoing transfers per month</label><input type="number" id="b-oc" name="monthly_outgoing_count" min="0"></div>
+        <div class="f half"><label for="b-ic">Est. incoming transfers per month</label><input type="number" id="b-ic" name="monthly_incoming_count" min="0"></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-avg">Average value per transfer</label><input type="text" id="b-avg" name="avg_transfer_value"></div>
+        <div class="f half"><label for="b-max">Maximum value per transfer</label><input type="text" id="b-max" name="max_transfer_value"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="pb-panel" data-p="3">
+      <p class="pb-stitle">Authorized Signatory Details</p>
+      <div class="row">
+        <div class="f third"><label for="b-sfn">First Name <span class="req">*</span></label><input type="text" id="b-sfn" name="sig_first_name" required><span class="ferr" id="e-b-sfn">Required.</span></div>
+        <div class="f third"><label for="b-smn">Middle Name</label><input type="text" id="b-smn" name="sig_middle_name"></div>
+        <div class="f third"><label for="b-sln">Last Name <span class="req">*</span></label><input type="text" id="b-sln" name="sig_last_name" required><span class="ferr" id="e-b-sln">Required.</span></div>
+      </div>
+      <div class="row"><div class="f full"><label for="b-sa">Address <span class="req">*</span></label><input type="text" id="b-sa" name="sig_address" required><span class="ferr" id="e-b-sa">Required.</span></div></div>
+      <div class="row"><div class="f full"><label for="b-sa2">Address Line 2</label><input type="text" id="b-sa2" name="sig_address_2"></div></div>
+      <div class="row">
+        <div class="f third"><label for="b-scity">City</label><input type="text" id="b-scity" name="sig_city"></div>
+        <div class="f third"><label for="b-sstate">State</label><input type="text" id="b-sstate" name="sig_state"></div>
+        <div class="f third"><label for="b-szip">Zip Code</label><input type="text" id="b-szip" name="sig_zip"></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-sctry">Country <span class="req">*</span></label><input type="text" id="b-sctry" name="sig_country" required><span class="ferr" id="e-b-sctry">Required.</span></div>
+        <div class="f half"><label for="b-snat">Nationality <span class="req">*</span></label><input type="text" id="b-snat" name="sig_nationality" required><span class="ferr" id="e-b-snat">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-spp">Passport / ID No. <span class="req">*</span></label><input type="text" id="b-spp" name="sig_passport_no" required><span class="ferr" id="e-b-spp">Required.</span></div>
+        <div class="f half"><label for="b-sppiss">Passport Issue Date <span class="req">*</span></label><input type="date" id="b-sppiss" name="sig_passport_issue" required><span class="ferr" id="e-b-sppiss">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-sppexp">Passport Expiry Date <span class="req">*</span></label><input type="date" id="b-sppexp" name="sig_passport_exp" required><span class="ferr" id="e-b-sppexp">Required.</span></div>
+        <div class="f half"><label for="b-stel">Telephone No. <span class="req">*</span></label><input type="tel" id="b-stel" name="sig_telephone" required><span class="ferr" id="e-b-stel">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-sfax">Fax No.</label><input type="tel" id="b-sfax" name="sig_fax"></div>
+        <div class="f half"><label for="b-sem">Signatory Email <span class="req">*</span></label><input type="email" id="b-sem" name="sig_email" required><span class="ferr" id="e-b-sem">Valid email required.</span></div>
+      </div>
+      <div class="row"><div class="f half"><label for="b-semc">Confirm Signatory Email <span class="req">*</span></label><input type="email" id="b-semc" name="sig_email_confirm" required><span class="ferr" id="e-b-semc">Emails must match.</span></div></div>
+      <p class="pb-stitle">Director Details</p>
+      <div class="row">
+        <div class="f third"><label for="b-dfn">First Name <span class="req">*</span></label><input type="text" id="b-dfn" name="dir_first_name" required><span class="ferr" id="e-b-dfn">Required.</span></div>
+        <div class="f third"><label for="b-dmn">Middle Name</label><input type="text" id="b-dmn" name="dir_middle_name"></div>
+        <div class="f third"><label for="b-dln">Last Name <span class="req">*</span></label><input type="text" id="b-dln" name="dir_last_name" required><span class="ferr" id="e-b-dln">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-dnat">Nationality <span class="req">*</span></label><input type="text" id="b-dnat" name="dir_nationality" required><span class="ferr" id="e-b-dnat">Required.</span></div>
+        <div class="f half"><label for="b-dpp">Passport / ID No. <span class="req">*</span></label><input type="text" id="b-dpp" name="dir_passport_no" required><span class="ferr" id="e-b-dpp">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-dppiss">Passport Issue Date <span class="req">*</span></label><input type="date" id="b-dppiss" name="dir_passport_issue" required><span class="ferr" id="e-b-dppiss">Required.</span></div>
+        <div class="f half"><label for="b-dppexp">Passport Expiry Date <span class="req">*</span></label><input type="date" id="b-dppexp" name="dir_passport_exp" required><span class="ferr" id="e-b-dppexp">Required.</span></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-daddr">Address</label><input type="text" id="b-daddr" name="dir_address"></div>
+        <div class="f half"><label for="b-dtel">Phone No. <span class="req">*</span></label><input type="tel" id="b-dtel" name="dir_telephone" required><span class="ferr" id="e-b-dtel">Required.</span></div>
+      </div>
+      <div class="row"><div class="f half"><label for="b-dem">Email Address <span class="req">*</span></label><input type="email" id="b-dem" name="dir_email" required><span class="ferr" id="e-b-dem">Valid email required.</span></div></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="pb-panel" data-p="4">
+      <p class="pb-stitle">Ultimate Beneficiary Details</p>
+      <div id="biz-benefs">
+        <div class="rpt-item" id="benef-0">
+          <div class="rpt-hd"><span>Beneficiary #1</span></div>
+          <div class="row"><div class="f third"><label>Share (%) <span class="req">*</span></label><input type="number" name="benef_share[]" min="1" max="100" required></div></div>
+          <div class="row">
+            <div class="f third"><label>First Name <span class="req">*</span></label><input type="text" name="benef_fname[]" required></div>
+            <div class="f third"><label>Middle Name</label><input type="text" name="benef_mname[]"></div>
+            <div class="f third"><label>Last Name <span class="req">*</span></label><input type="text" name="benef_lname[]" required></div>
+          </div>
+          <div class="row">
+            <div class="f half"><label>Nationality <span class="req">*</span></label><input type="text" name="benef_nationality[]" required></div>
+            <div class="f half"><label>Passport / ID No. <span class="req">*</span></label><input type="text" name="benef_passport[]" required></div>
+          </div>
+          <div class="row">
+            <div class="f half"><label>Passport Issue Date <span class="req">*</span></label><input type="date" name="benef_ppiss[]" required></div>
+            <div class="f half"><label>Passport Expiry Date <span class="req">*</span></label><input type="date" name="benef_ppexp[]" required></div>
+          </div>
+          <div class="row">
+            <div class="f half"><label>Address</label><input type="text" name="benef_address[]"></div>
+            <div class="f half"><label>Phone No. <span class="req">*</span></label><input type="tel" name="benef_phone[]" required></div>
+          </div>
+          <div class="row"><div class="f half"><label>Email Address <span class="req">*</span></label><input type="email" name="benef_email[]" required></div></div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-ghost" style="font-size:12.5px;padding:8px 18px;margin-top:4px;" onclick="addBenef()">+ Add Another Beneficiary</button>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="pb-panel" data-p="5">
+      <p class="pb-stitle">Source of Initial Funding</p>
+      <div class="row">
+        <div class="f half"><label for="b-fcur">Currency of Initial Funding</label><input type="text" id="b-fcur" name="funding_currency"></div>
+        <div class="f half"><label for="b-fval">Value of Initial Funding</label><input type="text" id="b-fval" name="funding_value"></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-obn">Originating Bank Name</label><input type="text" id="b-obn" name="originating_bank_name"></div>
+        <div class="f half"><label for="b-oba">Originating Bank Address</label><input type="text" id="b-oba" name="originating_bank_address"></div>
+      </div>
+      <div class="row">
+        <div class="f half"><label for="b-an">Account Name</label><input type="text" id="b-an" name="account_name_funding"></div>
+        <div class="f half"><label for="b-anum">Account Number</label><input type="text" id="b-anum" name="account_number_funding"></div>
+      </div>
+      <div class="row"><div class="f half"><label for="b-sig2">Signatory</label><input type="text" id="b-sig2" name="signatory_name_funding"></div></div>
+      <div class="row"><div class="f full"><label for="b-fsd">Describe precisely how these funds were generated</label><textarea id="b-fsd" name="funds_source_description" rows="4"></textarea></div></div>
+      <p class="pb-stitle">Primary Account Details</p>
+      <div class="row">
+        <div class="f half"><label for="b-ac">Account Currency <span class="req">*</span></label><input type="text" id="b-ac" name="account_currency" required><span class="ferr" id="e-b-ac">Required.</span></div>
+        <div class="f half"><label for="b-aref">Account Reference Name (optional)</label><input type="text" id="b-aref" name="account_reference_name"></div>
+      </div>
+      <p class="pb-stitle">Referral</p>
+      <div class="row"><div class="f half"><label for="b-ref">Recommended By</label><input type="text" id="b-ref" name="recommended_by"></div></div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="pb-panel" data-p="6">
+      <div class="coll"><div class="coll-head" onclick="togColl(this)">KYC / AML Documentation Note</div><div class="coll-body">Please ensure all documents are clear and valid. PCM may assist with intake and document coordination and transmit the compiled package to Prominence Bank. Prominence Bank may request additional documentation or enhanced due diligence at any time. Incomplete or inconsistent information may delay processing or result in the application being declined.</div></div>
+      <p class="pb-stitle">Passport Upload</p>
+      <div class="f full" style="margin-bottom:18px;">
+        <label>Insert Full Color Photo of your Passport <span class="req">*</span></label>
+        <div class="filebox" onclick="document.getElementById('b-ppfile').click()">
+          <input type="file" id="b-ppfile" name="passport_photo" accept="image/*,.pdf" required onchange="hFile(this,'b-ppname','b-ppclear')">
+          <span class="filebtn">Choose File</span>
+          <span class="filename" id="b-ppname">No file chosen</span>
+          <button type="button" class="fileclear" id="b-ppclear" onclick="clrFile(event,'b-ppfile','b-ppname','b-ppclear')">Remove</button>
+        </div>
+        <span class="ferr" id="e-b-ppfile">Passport photo is required.</span>
+      </div>
+      <p class="pb-stitle">Account Opening Fee — Payment Instructions</p>
+      <div class="paybox">
+        <h3>Account Opening Fee (Onboarding &amp; Compliance Processing Fee)</h3>
+        <p><em>Payment does not guarantee approval or account opening.</em></p>
+        <ul>
+          <li><strong>€25,000</strong> – Euro / Savings / Custody / Cryptocurrency Account</li>
+          <li><strong>$25,000</strong> – USD Account &nbsp;|&nbsp; <strong>€50,000</strong> – Numbered Account</li>
+        </ul>
+        <hr>
+        <h3>Option 1: SWIFT — EURO (€)</h3>
+        <p><strong>Bank:</strong> Wise Europe, Rue du Trône 100, 3rd floor, Brussels 1050, Belgium</p>
+        <p><strong>SWIFT:</strong> TRWIBEB1XXX &nbsp;|&nbsp; <strong>IBAN:</strong> BE31905717979455</p>
+        <p><strong>Account:</strong> PROMINENCE CLIENT MANAGEMENT</p>
+        <p><strong>Reference:</strong> Application ID: [Your ID] | Onboarding and Compliance Processing Fee</p>
+        <hr>
+        <h3>Option 1: SWIFT — USD ($)</h3>
+        <p><strong>Bank:</strong> Wise US Inc., 108 W 13th St, Wilmington, DE 19801, USA</p>
+        <p><strong>SWIFT:</strong> TRWIUS35XXX &nbsp;|&nbsp; <strong>Account No.:</strong> 205414015428310</p>
+        <hr>
+        <h3>Option 2: Cryptocurrency (USDT TRC20)</h3>
+        <div class="cryptoaddr">TPYjSzK3BbZRZAVhBoRZcdyzKpQ9NN6S6Y</div>
+        <p style="margin-top:8px;font-size:12px;color:#7aaec8;">⚠ KTT / Telex are NOT accepted for the opening fee.</p>
+      </div>
+      <p class="pb-stitle">Proof of Fee Payment Upload</p>
+      <div class="f full" style="margin-bottom:18px;">
+        <label>Insert Full Color Photo of your Offshore Account Opening Fees Payment <span class="req">*</span></label>
+        <div class="filebox" onclick="document.getElementById('b-payfile').click()">
+          <input type="file" id="b-payfile" name="fee_payment_proof" accept="image/*,.pdf" required onchange="hFile(this,'b-payname','b-payclear')">
+          <span class="filebtn">Choose File</span>
+          <span class="filename" id="b-payname">No file chosen</span>
+          <button type="button" class="fileclear" id="b-payclear" onclick="clrFile(event,'b-payfile','b-payname','b-payclear')">Remove</button>
+        </div>
+        <span class="ferr" id="e-b-payfile">Payment proof is required.</span>
+      </div>
+      <div class="coll"><div class="coll-head" onclick="togColl(this)">Third-Party Onboarding and Payment Notice</div><div class="coll-body">This application may be supported by Prominence Client Management / Prominence Account Management ("PCM"), a separate legal entity acting as an independent introducer providing administrative onboarding coordination only. PCM is not authorized to bind Prominence Bank or make representations regarding approval. Any Account Opening Fee paid to PCM is a service fee for onboarding support; it is not a deposit with Prominence Bank.</div></div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="pb-panel" data-p="7">
+      <div class="coll"><div class="coll-head" onclick="togColl(this)">Agreed and Attested — Click to expand / view full terms</div>
+        <div class="coll-body" style="max-height:260px;overflow-y:auto;">
+          <p><strong>A.</strong> The Bank will automatically reject any application without all mandatory items: opening fee, proof of payment, and required corporate documentation.</p>
+          <p><strong>B.</strong> KTT/TELEX payments are strictly prohibited. Accepted: SWIFT or Cryptocurrency. Application ID must appear in payment reference.</p>
+          <p><strong>C.</strong> Minimum balance of $/€10,000 must be maintained at all times.</p>
+          <p><strong>D.</strong> Account activity must align with declared information. Material deviations may require additional verification.</p>
+          <p><strong>E.</strong> All information provided is true, accurate, and complete. The Bank is authorized to conduct full AML/KYC checks.</p>
+          <p><strong>F.</strong> Accounts are administered under the ETMO diplomatic framework and are not closed solely upon client request.</p>
+          <p><strong>G.</strong> The Bank applies internationally aligned AML/KYC and FATF-based controls.</p>
+          <p><strong>H.</strong> Personal and corporate data is processed for application assessment under applicable data protection obligations.</p>
+        </div>
+      </div>
+      <p class="pb-stitle">Authorized Signatory Declaration</p>
+      <div class="row"><div class="f full"><label for="b-fsn">Full Name <span class="req">*</span></label><input type="text" id="b-fsn" name="signatory_name" required><span class="ferr" id="e-b-fsn">Required.</span></div></div>
+      <div class="row"><div class="f half"><label for="b-fsd2">Date <span class="req">*</span></label><input type="date" id="b-fsd2" name="signature_date" required><span class="ferr" id="e-b-fsd2">Required.</span></div></div>
+      <p class="pb-stitle">Signature</p>
+      <div class="sig-wrap">
+        <div class="sig-toolbar">
+          <span>Draw your signature in the box below</span>
+          <button type="button" class="sig-clr" onclick="clrSig('b-sigc','b-sigd')">Clear</button>
+        </div>
+        <canvas id="b-sigc"></canvas>
+      </div>
+      <input type="hidden" id="b-sigd" name="signature_data">
+      <span class="ferr" id="e-b-sig" style="margin-top:4px;">Signature is required.</span>
+      <div class="agreebox" style="margin-top:18px;">
+        <label class="chk">
+          <input type="checkbox" id="b-agree" name="agreed_attested" required>
+          I confirm that I have read and agree to the "AGREED AND ATTESTED" section, including payment/refund terms and the Bank's account retention provisions. <span class="req">*</span>
+        </label>
+        <span class="ferr" id="e-b-agree">You must agree to continue.</span>
+      </div>
+    </div>
+
+  </div><!-- /pb-body -->
+
+  <div class="pb-navrow">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button type="button" class="btn btn-navy" id="bp-back" style="display:none" onclick="bpBack()">← Back</button>
+      <button type="button" class="btn btn-ghost" onclick="bpSave()">Save &amp; Continue Later</button>
+    </div>
+    <button type="button" class="btn btn-sky" id="bp-next" onclick="bpNext()">Next Step →</button>
+    <button type="submit" class="btn btn-submit" id="bp-submit" style="display:none">Submit Application</button>
+  </div>
+  </form>
+
+  <div class="pb-success" id="bp-ok">
+    <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h2>Application Submitted Successfully</h2>
+    <p>Thank you. Your Business Bank Account application has been received.<br>Our team will contact you at the email address provided.<br><br>Please ensure your opening fee has been sent with the correct Application ID in the payment reference.</p>
+  </div>
+
+</div><!-- /pb-wrap -->
+<div class="toast" id="bp-toast">✔ Progress saved to browser</div>
+
+<script>
+var BS=1,BT=7;
+function bUpd(s){
+  var pct=Math.round(s/BT*100);
+  document.getElementById('bp-bar').style.width=pct+'%';
+  document.getElementById('bp-cur').textContent=s;
+  document.getElementById('bp-pct').textContent=pct;
+  document.querySelectorAll('#pbbf .pb-tab').forEach(function(t){var n=parseInt(t.dataset.s);t.classList.remove('active','done');if(n===s)t.classList.add('active');else if(n<s)t.classList.add('done');});
+  document.querySelectorAll('#pbbf .pb-panel').forEach(function(p){p.classList.toggle('active',parseInt(p.dataset.p)===s);});
+  document.getElementById('bp-back').style.display=s>1?'':'none';
+  document.getElementById('bp-next').style.display=s<BT?'':'none';
+  document.getElementById('bp-submit').style.display=s===BT?'':'none';
+  var w=document.getElementById('pbbf');window.scrollTo({top:w.getBoundingClientRect().top+window.pageYOffset-20,behavior:'smooth'});
+}
+function bVld(s){
+  var ok=true;
+  function c(id,eid,fn){var el=document.getElementById(id),er=document.getElementById(eid);if(!el)return;var v=fn?fn(el):el.value.trim()!=='';if(er)er.classList.toggle('show',!v);el.classList.toggle('err',!v);if(!v)ok=false;}
+  if(s===1){c('b-appid','e-b-appid');var r=document.querySelector('input[name="b_acct_type"]:checked');document.getElementById('e-b-acct').classList.toggle('show',!r);if(!r)ok=false;}
+  if(s===2){c('b-cn','e-b-cn');c('b-ra','e-b-ra');c('b-ctry','e-b-ctry');c('b-tel','e-b-tel');c('b-incorp','e-b-incorp');c('b-em','e-b-em',function(e){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value);});if(!document.getElementById('b-certfile').files.length){document.getElementById('e-b-cert').classList.add('show');ok=false;}}
+  if(s===3){c('b-sfn','e-b-sfn');c('b-sln','e-b-sln');c('b-sa','e-b-sa');c('b-sctry','e-b-sctry');c('b-snat','e-b-snat');c('b-spp','e-b-spp');c('b-sppiss','e-b-sppiss');c('b-sppexp','e-b-sppexp');c('b-stel','e-b-stel');c('b-sem','e-b-sem',function(e){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value);});c('b-semc','e-b-semc',function(e){return e.value===document.getElementById('b-sem').value&&e.value.trim()!=='';});c('b-dfn','e-b-dfn');c('b-dln','e-b-dln');c('b-dnat','e-b-dnat');c('b-dpp','e-b-dpp');c('b-dppiss','e-b-dppiss');c('b-dppexp','e-b-dppexp');c('b-dtel','e-b-dtel');c('b-dem','e-b-dem',function(e){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value);});}
+  if(s===5){c('b-ac','e-b-ac');}
+  if(s===6){if(!document.getElementById('b-ppfile').files.length){document.getElementById('e-b-ppfile').classList.add('show');ok=false;}if(!document.getElementById('b-payfile').files.length){document.getElementById('e-b-payfile').classList.add('show');ok=false;}}
+  if(s===7){c('b-fsn','e-b-fsn');c('b-fsd2','e-b-fsd2');var sd=document.getElementById('b-sigd').value;document.getElementById('e-b-sig').classList.toggle('show',!sd);if(!sd)ok=false;var ag=document.getElementById('b-agree').checked;document.getElementById('e-b-agree').classList.toggle('show',!ag);if(!ag)ok=false;}
+  return ok;
+}
+function bpNext(){if(bVld(BS)&&BS<BT){BS++;bUpd(BS);}}
+function bpBack(){if(BS>1){BS--;bUpd(BS);}}
+document.getElementById('pbbf-form').addEventListener('submit',function(e){
+  e.preventDefault();if(!bVld(7))return;
+  document.getElementById('b-sigd').value=document.getElementById('b-sigc').toDataURL();
+  document.getElementById('pbbf-form').style.display='none';
+  document.getElementById('bp-ok').classList.add('show');
+  ['pb-stepnav','pb-prog-wrap','pb-prog-label','pb-topbar'].forEach(function(cls){var el=document.querySelector('#pbbf .'+cls);if(el)el.style.display='none';});
+});
+function bpSave(){var t=document.getElementById('bp-toast');t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
+function togColl(h){h.classList.toggle('open');h.nextElementSibling.classList.toggle('open');}
+function hFile(i,nid,cid){var n=document.getElementById(nid),c=document.getElementById(cid);if(i.files.length){n.textContent=i.files[0].name;c.style.display='inline';}else{n.textContent='No file chosen';c.style.display='none';}}
+function clrFile(e,iid,nid,cid){e.stopPropagation();document.getElementById(iid).value='';document.getElementById(nid).textContent='No file chosen';document.getElementById(cid).style.display='none';}
+function clrSig(cid,did){var c=document.getElementById(cid);c.getContext('2d').clearRect(0,0,c.width,c.height);document.getElementById(did).value='';}
+// Beneficiary repeater
+var bc=1;
+function addBenef(){
+  bc++;var d=document.getElementById('biz-benefs'),i=document.createElement('div');
+  i.className='rpt-item';i.id='benef-'+bc;
+  i.innerHTML='<div class="rpt-hd"><span>Beneficiary #'+bc+'</span><button type="button" class="rpt-rm" onclick="rmBenef(\'benef-'+bc+'\')">Remove</button></div><div class="row"><div class="f third"><label>Share (%) <span class="req">*</span></label><input type="number" name="benef_share[]" min="1" max="100" required></div></div><div class="row"><div class="f third"><label>First Name <span class="req">*</span></label><input type="text" name="benef_fname[]" required></div><div class="f third"><label>Middle Name</label><input type="text" name="benef_mname[]"></div><div class="f third"><label>Last Name <span class="req">*</span></label><input type="text" name="benef_lname[]" required></div></div><div class="row"><div class="f half"><label>Nationality <span class="req">*</span></label><input type="text" name="benef_nationality[]" required></div><div class="f half"><label>Passport / ID No. <span class="req">*</span></label><input type="text" name="benef_passport[]" required></div></div><div class="row"><div class="f half"><label>Passport Issue Date <span class="req">*</span></label><input type="date" name="benef_ppiss[]" required></div><div class="f half"><label>Passport Expiry Date <span class="req">*</span></label><input type="date" name="benef_ppexp[]" required></div></div><div class="row"><div class="f half"><label>Address</label><input type="text" name="benef_address[]"></div><div class="f half"><label>Phone No. <span class="req">*</span></label><input type="tel" name="benef_phone[]" required></div></div><div class="row"><div class="f half"><label>Email Address <span class="req">*</span></label><input type="email" name="benef_email[]" required></div></div>';
+  d.appendChild(i);
+}
+function rmBenef(id){var el=document.getElementById(id);if(el)el.remove();}
+// Signature
+(function(){
+  var c=document.getElementById('b-sigc');if(!c)return;
+  var ctx=c.getContext('2d'),dr=false;
+  function rsz(){var r=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=120*dpr;ctx.scale(dpr,dpr);ctx.strokeStyle='#162039';ctx.lineWidth=2;ctx.lineCap='round';}
+  rsz();window.addEventListener('resize',rsz);
+  function gp(e){var r=c.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+  c.addEventListener('mousedown',function(e){dr=true;var p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+  c.addEventListener('mousemove',function(e){if(!dr)return;var p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
+  c.addEventListener('mouseup',function(){dr=false;document.getElementById('b-sigd').value=c.toDataURL();});
+  c.addEventListener('touchstart',function(e){e.preventDefault();dr=true;var p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+  c.addEventListener('touchmove',function(e){e.preventDefault();if(!dr)return;var p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();},{passive:false});
+  c.addEventListener('touchend',function(){dr=false;document.getElementById('b-sigd').value=c.toDataURL();});
+})();
+</script>
+</body>
+</html>
